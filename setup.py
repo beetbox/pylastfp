@@ -9,11 +9,15 @@ def _read(fn):
 
 ext = Extension(
     "_fplib",
-    ["fplib.pyx"],
+    [
+        "fplib.pyx",
+        "fplib/src/Filter.cpp",
+        "fplib/src/FingerprintExtractor.cpp",
+        "fplib/src/OptFFT.cpp",
+    ],
     language="c++",
-    include_dirs=['../fplib/include'],
+    include_dirs=['fplib/include'],
     libraries=["stdc++", "samplerate", "fftw3f"],
-    extra_objects=["../fplib/liblastfmfp_static.a"],
 )
 
 setup(
