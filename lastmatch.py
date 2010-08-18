@@ -1,21 +1,44 @@
 #!/usr/bin/env python
-
+"""A simple program for using pylastfp to fingerprint and look up
+metadata for MP3 files. Usage:
+    $ python lastmatch.py my_great_music.mp3
+"""
 import mad
 import sys
 import os
 import lastfp
 
-BLOCK_SIZE = 1024
-def readblocks(f):
+def readblocks(f, block_size=1024):
+    """A generator that, given a file-like object, reads blocks (of
+    the given size) from the file and yields them until f.read()
+    returns a "falsey" value.
+    """
     while True:
-        out = f.read(BLOCK_SIZE)
+        out = f.read(block_size)
         if not out:
             break
         yield out
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print "usage: python lastmatch.py my_great_music.mp3"
+        sys.exit(1)
     path = os.path.abspath(sys.argv[1])
     f = mad.MadFile(path)
-    matches = lastfp.match(path, readblocks(f), f.samplerate(), f.total_time())
+
+    # Perform match.
+    try:
+        matches = lastfp.match(path,
+                               readblocks(f),
+                               f.samplerate(),
+                               f.total_time()/1000)
+    except lastfp.ExtractionError:
+        print 'fingerprinting failed!'
+        sys.exit(1)
+    except lastfp.QueryError:
+        print 'could not match fingerprint!'
+        sys.exit(1)
+
+    # Show results.
     for track in matches:
-        print '%s - %s' % (track['artist'], track['title'])
+        print '%f: %s - %s' % (track['rank'], track['artist'], track['title'])
