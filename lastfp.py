@@ -1,18 +1,9 @@
 import fplib
-import mad
-import sys
 import urllib
 import urllib2
-import os
 import hashlib
 import xml.etree.ElementTree as etree
-
-def readf(f):
-    while True:
-        out = f.read(100)
-        if not out:
-            break
-        yield out
+import os
 
 # http://code.activestate.com/recipes/146306/
 def formdata_encode(fields):
@@ -33,12 +24,6 @@ def formdata_post(url, fields):
     req = urllib2.Request(url, data)
     req.add_header('Content-Type', content_type)
     return urllib2.urlopen(req).read()
-
-
-def readfp(path):
-    f = mad.MadFile(path)
-    fpdata = fplib.fingerprint(readf(f), f.samplerate(), 2)
-    return f.total_time(), fpdata
 
 def getfpid(path, duration, fpdata):
     url = 'http://www.last.fm/fingerprint/query/'
@@ -93,12 +78,11 @@ def parsemetadataxml(xml):
         })
     return out
 
-if __name__ == '__main__':
-    path = os.path.abspath(sys.argv[1])
-    duration, fpdata = readfp(path)
-    if not fpdata: sys.exit(1)
+def match(path, pcmiter, samplerate, duration, channels=2):
+    fpdata = fplib.fingerprint(pcmiter, samplerate, channels)
+    if not fpdata: return None
     fpid = getfpid(path, duration, fpdata)
-    if not fpid: sys.exit(1)
+    if not fpid: return None
     xml = getmetadataxml(fpid)
-    for track in parsemetadataxml(xml):
-        print '%s - %s' % (track['artist'], track['title'])
+    return parsemetadataxml(xml)
+
