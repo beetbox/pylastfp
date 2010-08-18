@@ -2,12 +2,12 @@
 fplib. The match() function performs the fingerprinting and queries the
 Last.fm servers for matches in one fell swoop.
 """
-import fplib
 import urllib
 import urllib2
 import hashlib
 import xml.etree.ElementTree as etree
 import os
+import _fplib
 
 class FingerprintError(Exception):
     """Base class for all exceptions raised by this module."""
@@ -112,7 +112,7 @@ def extract(pcmiter, samplerate, channels):
     audio. Returns a byte string of fingerprint data. Raises an
     ExtractionError if fingerprinting fails.
     """
-    fpdata = fplib.fingerprint(pcmiter, samplerate, channels)
+    fpdata = _fplib.fingerprint(pcmiter, samplerate, channels)
     if not fpdata:
         raise ExtractionError()
     return fpdata

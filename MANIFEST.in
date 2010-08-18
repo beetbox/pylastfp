@@ -1,0 +1,5 @@
+# Documentation.
+include README.rst
+
+# Utility script.
+include lastmatch.py
