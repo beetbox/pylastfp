@@ -30,11 +30,11 @@ if __name__ == '__main__':
 
     # Perform match.
     try:
-        matches = lastfp.match(API_KEY,
-                               path,
-                               readblocks(f),
-                               f.samplerate(),
-                               f.total_time()/1000)
+        xml = lastfp.match(API_KEY,
+                           path,
+                           readblocks(f),
+                           f.samplerate(),
+                           f.total_time()/1000)
     except lastfp.ExtractionError:
         print 'fingerprinting failed!'
         sys.exit(1)
@@ -43,5 +43,6 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Show results.
+    matches = lastfp.parse_metadata(xml)
     for track in matches:
         print '%f: %s - %s' % (track['rank'], track['artist'], track['title'])

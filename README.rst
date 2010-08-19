@@ -40,7 +40,8 @@ The script exhibits the usual way to use pylastfp, which is this::
 
     >>> import lastfp
     >>> ...`
-    >>> matches = lastfp.match(apikey, path, pcmdata, samplerate, time_in_secs)
+    >>> xml = lastfp.match(apikey, path, pcmdata, samplerate, time_in_secs)
+    >>> matches = lastfp.parse_metadata(xml)
     >>> print matches[0]['artist'], '-', matches[0]['title']
     The National - Fake Emprire
 

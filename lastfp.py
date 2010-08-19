@@ -77,19 +77,20 @@ def fpid_query(path, duration, fpdata):
 
 def metadata_query(fpid, apikey):
     """Queries the Last.fm servers for metadata about a given
-    fingerprint ID (an integer). Returns a list of track info
-    dictionaries.
+    fingerprint ID (an integer). Returns the XML response (a string).
     """
-    # Perform the request.
     url = 'http://ws.audioscrobbler.com/2.0/'
     params = {
         'method': 'track.getFingerprintMetadata',
         'fingerprintid': fpid,
         'api_key': apikey,
     }
-    xml = urllib.urlopen('%s?%s' % (url, urllib.urlencode(params))).read()
+    return urllib.urlopen('%s?%s' % (url, urllib.urlencode(params))).read()
 
-    # Parse the XML.
+def parse_metadata(xml):
+    """Given an XML document (string) returned from metadata_query(),
+    parse the response into a list of track info dicts.
+    """
     root = etree.fromstring(xml)
     out = []
     for track in root.find('tracks').findall('track'):
