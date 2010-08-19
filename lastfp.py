@@ -4,7 +4,6 @@ Last.fm servers for matches in one fell swoop.
 """
 import urllib
 import urllib2
-import hashlib
 import xml.etree.ElementTree as etree
 import os
 import _fplib
@@ -55,13 +54,11 @@ def fpid_query(path, duration, fpdata):
     """
     url = 'http://www.last.fm/fingerprint/query/'
     params = {
-        'artist': '',
+        'artist': '', # fixme
         'album': '',
         'track': '',
         'duration': duration,
         'filename': os.path.basename(path),
-        'username': '',
-        'sha256': hashlib.sha256(path).hexdigest(),
     }
     res = formdata_post('%s?%s' % (url, urllib.urlencode(params)),
                         {'fpdata': fpdata})

@@ -56,10 +56,10 @@ To-Do
 Things to do:
 
 - simple mechanism for loading PCM data (using pygst?)
-- "full" fingerprint for submission
 - silence-skipping optimization
 - rate limiting for API calls
 - error handling for API calls
+- submit track metadata along with fingerprint data
 
 
 Credits
