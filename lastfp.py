@@ -110,12 +110,31 @@ def extract(pcmiter, samplerate, channels, duration = -1):
     ExtractionError if fingerprinting fails.
     """
     extractor = _fplib.Extractor(samplerate, channels, duration)
-    for buf in pcmiter:
-        if extractor.process(buf, False):
-            break
-    else:
-        # Extractor never became ready.
+
+    # Get first block.
+    try:
+        next_block = pcmiter.next()
+    except StopIteration:
         raise ExtractionError()
+
+    # Get and process subsequent blocks.
+    while True:
+        # Shift over blocks.
+        cur_block = next_block
+        try:
+            next_block = pcmiter.next()
+        except StopIteration:
+            next_block = None
+        done = next_block is None
+
+        # Process the block.
+        if extractor.process(cur_block, done):
+            # Success!
+            break
+
+        # End of file but processor never became ready?
+        if done:
+            raise ExtractionError()
 
     # Get resulting fingerprint data.
     out = extractor.result()
