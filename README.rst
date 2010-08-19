@@ -11,12 +11,12 @@ Installation
 
 To install, you will need `Cython`_ in addition to a compiler and the
 dependencies required by fplib itself: `fftw`_ (single-precision) and
-`libsamplerate`_. Once you have these, just type "python setup.py install"
+`libsamplerate`_. Once you have these, just type ``python setup.py install``
 and you're good to go.
 
 .. _Cython: http://cython.org/
 .. _fftw: http://www.fftw.org/
-.. _libsamplerate: http://www.mega-nerd.com/SRC/
+.. _libsamplerate: http://www.mega-nerd.com/SRC/`
 
 
 Running
@@ -39,13 +39,15 @@ Using in Your Code
 The script exhibits the usual way to use pylastfp, which is this::
 
     >>> import lastfp
-    >>> ...
-    >>> matches = lastfp.match(path, pcmblocks, samplerate, time_in_secs)
+    >>> ...`
+    >>> matches = lastfp.match(apikey, path, pcmdata, samplerate, time_in_secs)
     >>> print matches[0]['artist'], '-', matches[0]['title']
     The National - Fake Emprire
 
 Of course, you'll need some way to get a PCM stream from any audio you want to
-fingerprint; this is (currently) outside the scope of this library.
+fingerprint; this is (currently) outside the scope of this library. The
+pcmdata parameter must be an iterable of Python ``buffer`` objects containing
+PCM data as arrays of C ``short`` values.
 
 
 To-Do

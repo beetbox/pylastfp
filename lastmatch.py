@@ -8,6 +8,8 @@ import sys
 import os
 import lastfp
 
+API_KEY = '2dc3914abf35f0d9c92d97d8f8e42b43'
+
 def readblocks(f, block_size=1024):
     """A generator that, given a file-like object, reads blocks (of
     the given size) from the file and yields them until f.read()
@@ -28,7 +30,8 @@ if __name__ == '__main__':
 
     # Perform match.
     try:
-        matches = lastfp.match(path,
+        matches = lastfp.match(API_KEY,
+                               path,
                                readblocks(f),
                                f.samplerate(),
                                f.total_time()/1000)

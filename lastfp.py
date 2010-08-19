@@ -78,7 +78,7 @@ def fpid_query(path, duration, fpdata):
     else:
         raise BadResponseError('unknown status: ' + res)
 
-def metadata_query(fpid):
+def metadata_query(fpid, apikey):
     """Queries the Last.fm servers for metadata about a given
     fingerprint ID (an integer). Returns a list of track info
     dictionaries.
@@ -88,7 +88,7 @@ def metadata_query(fpid):
     params = {
         'method': 'track.getFingerprintMetadata',
         'fingerprintid': fpid,
-        'api_key': '2dc3914abf35f0d9c92d97d8f8e42b43',
+        'api_key': apikey,
     }
     xml = urllib.urlopen('%s?%s' % (url, urllib.urlencode(params))).read()
 
@@ -117,7 +117,7 @@ def extract(pcmiter, samplerate, channels):
         raise ExtractionError()
     return fpdata
 
-def match(path, pcmiter, samplerate, duration, channels=2):
+def match(apikey, path, pcmiter, samplerate, duration, channels=2):
     """Given a PCM data stream, perform fingerprinting and look up the
     metadata for the audio. pcmiter must be an iterable of blocks of
     PCM data (buffers). duration is the total length of the track in
@@ -127,4 +127,4 @@ def match(path, pcmiter, samplerate, duration, channels=2):
     """
     fpdata = extract(pcmiter, samplerate, channels)
     fpid = fpid_query(path, duration, fpdata)
-    return metadata_query(fpid)
+    return metadata_query(fpid, apikey)
