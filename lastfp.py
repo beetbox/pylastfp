@@ -104,15 +104,24 @@ def metadata_query(fpid, apikey):
 
 class ExtractionError(FingerprintError):
     pass
-def extract(pcmiter, samplerate, channels):
+def extract(pcmiter, samplerate, channels, duration = -1):
     """Given a PCM data stream, extract fingerprint data from the
     audio. Returns a byte string of fingerprint data. Raises an
     ExtractionError if fingerprinting fails.
     """
-    fpdata = _fplib.fingerprint(pcmiter, samplerate, channels)
-    if not fpdata:
+    extractor = _fplib.Extractor(samplerate, channels, duration)
+    for buf in pcmiter:
+        if extractor.process(buf, False):
+            break
+    else:
+        # Extractor never became ready.
         raise ExtractionError()
-    return fpdata
+
+    # Get resulting fingerprint data.
+    out = extractor.result()
+    if out is None:
+        raise ExtractionError()
+    return out
 
 def match(apikey, path, pcmiter, samplerate, duration, channels=2):
     """Given a PCM data stream, perform fingerprinting and look up the
