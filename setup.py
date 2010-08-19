@@ -7,6 +7,9 @@ def _read(fn):
     path = os.path.join(os.path.dirname(__file__), fn)
     return open(path).read()
 
+# Search far and wide for the dependencies.
+INC_DIRS = ['/opt/local/include']
+
 ext = Extension(
     "_fplib",
     [
@@ -16,7 +19,7 @@ ext = Extension(
         "fplib/src/OptFFT.cpp",
     ],
     language="c++",
-    include_dirs=['fplib/include'],
+    include_dirs=['fplib/include'] + INC_DIRS,
     libraries=["stdc++", "samplerate", "fftw3f"],
 )
 
