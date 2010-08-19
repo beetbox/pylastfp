@@ -8,7 +8,11 @@ import sys
 import os
 import lastfp
 
-API_KEY = '2dc3914abf35f0d9c92d97d8f8e42b43'
+# This API key is specifically for this script, lastmatch.py. If you
+# use pylastfp in your project, you'll want to generate your own. It's
+# easy and free!
+# http://last.fm/api/account
+API_KEY = '7821ee9bf9937b7f94af2abecced8ddd'
 
 def readblocks(f, block_size=1024):
     """A generator that, given a file-like object, reads blocks (of
