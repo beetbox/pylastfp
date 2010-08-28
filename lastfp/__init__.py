@@ -161,4 +161,5 @@ def gst_match(apikey, path):
     """
     from . import gstdec
     with gstdec.GstAudioFile(path) as f:
-        return match(apikey, path, f, f.samplerate, 172, f.channels)
+        return match(apikey, path, f,
+                     f.samplerate, f.duration/1000000000, f.channels)

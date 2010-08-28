@@ -29,6 +29,7 @@ file:
     >>> with GstAudioFile('something.mp3') as f:
     >>>     print f.samplerate
     >>>     print f.channels
+    >>>     print f.duration
 """
 from __future__ import with_statement
 
@@ -128,8 +129,13 @@ class GstAudioFile(object):
         >>> with GstAudioFile('something.mp3') as f:
         >>>     print f.samplerate
         >>>     print f.channels
+        >>>     print f.duration
         >>>     for block in f:
         >>>         do_something(block)
+    
+    Iterating the object yields blocks of 16-bit PCM data. Three
+    pieces of stream information are also available: samplerate (in Hz),
+    number of channels, and duration (in nanoseconds).
     
     It's very important that the client call close() when it's done
     with the object. Otherwise, the program is likely to hang on exit.
@@ -207,8 +213,26 @@ class GstAudioFile(object):
         # This also is our opportunity to read information about the
         # stream.
         info = pad.get_negotiated_caps()[0]
+        
+        # Stream attributes.
         self.channels = info['channels']
         self.samplerate = info['rate']
+        
+        # Query duration.
+        q = gst.query_new_duration(gst.FORMAT_TIME)
+        if pad.get_peer().query(q):
+            # Success.
+            format, length = q.parse_duration()
+            if format == gst.FORMAT_TIME:
+                self.duration = length
+            else:
+                # Not sure what happened.
+                self.duration = None
+        else:
+            # Failure.
+            self.duration = None
+        
+        # Allow constructor to complete.
         self.ready_sem.release()
     
     _got_a_pad = False
@@ -293,5 +317,6 @@ if __name__ == '__main__':
         with GstAudioFile(path) as f:
             print f.channels
             print f.samplerate
+            print f.duration / 1000000000
             for s in f:
                 print len(s), ord(s[0])
