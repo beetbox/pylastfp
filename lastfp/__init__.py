@@ -87,22 +87,6 @@ def metadata_query(fpid, apikey):
     }
     return urllib.urlopen('%s?%s' % (url, urllib.urlencode(params))).read()
 
-def parse_metadata(xml):
-    """Given an XML document (string) returned from metadata_query(),
-    parse the response into a list of track info dicts.
-    """
-    root = etree.fromstring(xml)
-    out = []
-    for track in root.find('tracks').findall('track'):
-        out.append({
-            'rank': float(track.attrib['rank']),
-            'artist': track.find('artist').find('name').text,
-            'artist_mbid': track.find('artist').find('mbid').text,
-            'title': track.find('name').text,
-            'track_mbid': track.find('mbid').text,
-        })
-    return out
-
 class ExtractionError(FingerprintError):
     pass
 def extract(pcmiter, samplerate, channels, duration = -1):
@@ -143,6 +127,9 @@ def extract(pcmiter, samplerate, channels, duration = -1):
         raise ExtractionError()
     return out
 
+
+# Main inteface.
+
 def match(apikey, path, pcmiter, samplerate, duration, channels=2):
     """Given a PCM data stream, perform fingerprinting and look up the
     metadata for the audio. pcmiter must be an iterable of blocks of
@@ -155,6 +142,25 @@ def match(apikey, path, pcmiter, samplerate, duration, channels=2):
     fpid = fpid_query(path, duration, fpdata)
     return metadata_query(fpid, apikey)
 
+def parse_metadata(xml):
+    """Given an XML document (string) returned from metadata_query(),
+    parse the response into a list of track info dicts.
+    """
+    root = etree.fromstring(xml)
+    out = []
+    for track in root.find('tracks').findall('track'):
+        out.append({
+            'rank': float(track.attrib['rank']),
+            'artist': track.find('artist').find('name').text,
+            'artist_mbid': track.find('artist').find('mbid').text,
+            'title': track.find('name').text,
+            'track_mbid': track.find('mbid').text,
+        })
+    return out
+
+
+# Convenience functions for using audio decoders.
+
 def gst_match(apikey, path):
     """Uses Gstreamer to decode an audio file and perform a match.
     Requires the Python Gstreamer bindings.
@@ -163,3 +169,33 @@ def gst_match(apikey, path):
     with gstdec.GstAudioFile(path) as f:
         return match(apikey, path, f,
                      f.samplerate, f.duration/1000000000, f.channels)
+
+def _readblocks(f, block_size=1024):
+    """A generator that, given a file-like object, reads blocks (of
+    the given size) from the file and yields them until f.read()
+    returns a "falsey" value.
+    """
+    while True:
+        out = f.read(block_size)
+        if not out:
+            break
+        yield out
+def mad_match(apikey, path):
+    """Uses MAD to decode an MPEG audio file and perform a match.
+    Requires the pymad module.
+    """
+    import mad
+    f = mad.MadFile(path)
+    
+    # Get number of channels.
+    if f.mode() == mad.MODE_SINGLE_CHANNEL:
+        channels = 1
+    elif f.mode() in (mad.MODE_DUAL_CHANNEL,
+                      mad.MODE_JOINT_STEREO,
+                      mad.MODE_STEREO):
+        channels = 2
+    else:
+        channels = 2
+    
+    return match(apikey, path, _readblocks(f),
+                 f.samplerate(), f.total_time()/1000, channels)
