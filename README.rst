@@ -37,6 +37,7 @@ instead of Gstreamer (for MPEG audio only) by supplying the ``-m`` flag::
    http://gstreamer.freedesktop.org/modules/gst-python.html
 .. _pymad: http://spacepants.org/src/pymad/
 
+
 Using in Your Code
 ------------------
 
@@ -64,6 +65,11 @@ fingerprint; this is (currently) outside the scope of this library. The
 pcmdata parameter must be an iterable of Python ``str`` of ``buffer`` objects
 containing PCM data as arrays of C ``short`` (16-bit integer) values.
 
+The module internally performs thread-safe API limiting to 5 queries per
+second, in accordance with `Last.fm's API TOS`_.
+
+.. _Last.fm's API TOS: http://www.last.fm/api/tos
+
 
 To-Do
 -----
@@ -71,7 +77,6 @@ To-Do
 Things to do:
 
 - silence-skipping optimization
-- rate limiting for API calls
 - error handling for API calls
 - submit track metadata along with fingerprint data
 

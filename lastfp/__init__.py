@@ -2,15 +2,40 @@
 fplib. The match() function performs the fingerprinting and queries the
 Last.fm servers for matches in one fell swoop.
 """
+from __future__ import with_statement # for Python 2.5
 import urllib
 import urllib2
 import xml.etree.ElementTree as etree
 import os
+import threading
+import time
 from . import _fplib
+
+URL_FPID = 'http://www.last.fm/fingerprint/query/'
+URL_METADATA = 'http://ws.audioscrobbler.com/2.0/'
 
 class FingerprintError(Exception):
     """Base class for all exceptions raised by this module."""
     pass
+
+
+# Rate limiting.
+QUERY_WAIT_TIME = 0.2 # Five queries per second.
+_last_query_time = 0.0
+_query_lock = threading.Lock()
+def _query_wrap(fun, *args, **kwargs):
+    """Wait until at least QUERY_WAIT_TIME seconds have passed
+    since the last invocation of this function, then call the given
+    function with the given arguments.
+    """
+    with _query_lock:
+        global _last_query_time
+        since_last_query = time.time() - _last_query_time
+        if since_last_query < QUERY_WAIT_TIME:
+            time.sleep(QUERY_WAIT_TIME - since_last_query)
+        _last_query_time = time.time()
+        return fun(*args, **kwargs)
+
 
 # The stdlib doesn't yet have a facility for multipart/form-data HTTP
 # requests, so here's an implementation based on this recipe:
@@ -52,15 +77,15 @@ def fpid_query(duration, fpdata):
     duration is the length of the track in (integral) seconds.
     Returns the fpid, an integer or raises a QueryError.
     """
-    url = 'http://www.last.fm/fingerprint/query/'
     params = {
         'artist': '', # fixme
         'album': '',
         'track': '',
         'duration': duration,
     }
-    res = formdata_post('%s?%s' % (url, urllib.urlencode(params)),
-                        {'fpdata': fpdata})
+    url = '%s?%s' % (URL_FPID, urllib.urlencode(params))
+    res = _query_wrap(formdata_post, url, {'fpdata': fpdata})
+    
     try:
         fpid, status = res.split()[:2]
         fpid = int(fpid)
@@ -78,13 +103,14 @@ def metadata_query(fpid, apikey):
     """Queries the Last.fm servers for metadata about a given
     fingerprint ID (an integer). Returns the XML response (a string).
     """
-    url = 'http://ws.audioscrobbler.com/2.0/'
     params = {
         'method': 'track.getFingerprintMetadata',
         'fingerprintid': fpid,
         'api_key': apikey,
     }
-    return urllib.urlopen('%s?%s' % (url, urllib.urlencode(params))).read()
+    url = '%s?%s' % (URL_METADATA, urllib.urlencode(params))
+    fh = _query_wrap(urllib.urlopen, url)
+    return fh.read()
 
 class ExtractionError(FingerprintError):
     pass
