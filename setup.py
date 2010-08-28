@@ -11,7 +11,7 @@ def _read(fn):
 INC_DIRS = ['/opt/local/include']
 
 ext = Extension(
-    "_fplib",
+    "lastfp._fplib",
     [
         "fplib.pyx",
         "fplib/src/Filter.cpp",
@@ -37,5 +37,5 @@ setup(
     cmdclass = {'build_ext': build_ext},
     ext_modules = [ext],
     
-    py_modules = ['lastfp'],
+    packages = ['lastfp'],
 )

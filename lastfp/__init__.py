@@ -6,7 +6,7 @@ import urllib
 import urllib2
 import xml.etree.ElementTree as etree
 import os
-import _fplib
+from . import _fplib
 
 class FingerprintError(Exception):
     """Base class for all exceptions raised by this module."""
@@ -154,3 +154,11 @@ def match(apikey, path, pcmiter, samplerate, duration, channels=2):
     fpdata = extract(pcmiter, samplerate, channels)
     fpid = fpid_query(path, duration, fpdata)
     return metadata_query(fpid, apikey)
+
+def gst_match(apikey, path):
+    """Uses Gstreamer to decode an audio file and perform a match.
+    Requires the Python Gstreamer bindings.
+    """
+    from . import gstdec
+    with gstdec.GstAudioFile(path) as f:
+        return match(apikey, path, f, f.samplerate, 172, f.channels)
