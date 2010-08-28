@@ -33,7 +33,8 @@ instead of Gstreamer (for MPEG audio only) by supplying the ``-m`` flag::
 
     $ ./lastmatch.py -m mysterious_music.mp3
 
-.. _Gstreamer's Python bindings: http://gstreamer.freedesktop.org/modules/gst-python.html
+.. _Gstreamer's Python bindings:
+   http://gstreamer.freedesktop.org/modules/gst-python.html
 .. _pymad: http://spacepants.org/src/pymad/
 
 Using in Your Code
@@ -42,7 +43,7 @@ Using in Your Code
 The script exhibits the usual way to use pylastfp, which is this::
 
     >>> import lastfp
-    >>> xml == lastfp.gst_match(apikey, path)
+    >>> xml = lastfp.gst_match(apikey, path)
     >>> matches = lastfp.parse_metadata(xml)
     >>> print matches[0]['artist'], '-', matches[0]['title']
     The National - Fake Emprire
@@ -56,7 +57,7 @@ uses MAD to decode instead of Gstreamer.
 If you have your own way of decoding audio, you can use the lower-level
 interface::
 
-    >>> xml = lastfp.match(apikey, path, pcmdata, samplerate, time_in_secs)
+    >>> xml = lastfp.match(apikey, pcmdata, samplerate, time_in_secs)
 
 Of course, you'll need some way to get a PCM stream from any audio you want to
 fingerprint; this is (currently) outside the scope of this library. The

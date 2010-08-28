@@ -46,7 +46,7 @@ class BadResponseError(QueryError):
     pass
 class NotFoundError(QueryError):
     pass
-def fpid_query(path, duration, fpdata):
+def fpid_query(duration, fpdata):
     """Send fingerprint data to Last.fm to get the corresponding
     fingerprint ID, which can then be used to fetch metadata.
     duration is the length of the track in (integral) seconds.
@@ -58,7 +58,6 @@ def fpid_query(path, duration, fpdata):
         'album': '',
         'track': '',
         'duration': duration,
-        'filename': os.path.basename(path),
     }
     res = formdata_post('%s?%s' % (url, urllib.urlencode(params)),
                         {'fpdata': fpdata})
@@ -130,7 +129,7 @@ def extract(pcmiter, samplerate, channels, duration = -1):
 
 # Main inteface.
 
-def match(apikey, path, pcmiter, samplerate, duration, channels=2):
+def match(apikey, pcmiter, samplerate, duration, channels=2):
     """Given a PCM data stream, perform fingerprinting and look up the
     metadata for the audio. pcmiter must be an iterable of blocks of
     PCM data (buffers). duration is the total length of the track in
@@ -139,7 +138,7 @@ def match(apikey, path, pcmiter, samplerate, duration, channels=2):
     subclass of FingerprintError if any step fails.
     """
     fpdata = extract(pcmiter, samplerate, channels)
-    fpid = fpid_query(path, duration, fpdata)
+    fpid = fpid_query(duration, fpdata)
     return metadata_query(fpid, apikey)
 
 def parse_metadata(xml):
@@ -167,7 +166,7 @@ def gst_match(apikey, path):
     """
     from . import gstdec
     with gstdec.GstAudioFile(path) as f:
-        return match(apikey, path, f,
+        return match(apikey, f,
                      f.samplerate, f.duration/1000000000, f.channels)
 
 def _readblocks(f, block_size=1024):
@@ -197,5 +196,5 @@ def mad_match(apikey, path):
     else:
         channels = 2
     
-    return match(apikey, path, _readblocks(f),
+    return match(apikey, _readblocks(f),
                  f.samplerate(), f.total_time()/1000, channels)
