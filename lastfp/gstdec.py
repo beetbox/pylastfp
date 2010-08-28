@@ -43,6 +43,7 @@ import urllib
 import Queue
 
 QUEUE_SIZE = 10
+BUFFER_SIZE = 10
 SENTINEL = '__GSTDEC_SENTINEL__'
 
 
@@ -172,6 +173,18 @@ class GstAudioFile(object):
             gst.Caps('audio/x-raw-int, width=16, depth=16, signed=true')
         )
         # FIXME set endianness?
+        # Set up the characteristics of the output. We don't want to
+        # drop any data (nothing is real-time here); we should bound
+        # the memory usage of the internal queue; and, most
+        # importantly, setting "sync" to False disables the default
+        # behavior in which you consume buffers in real time. This way,
+        # we get data as soon as it's decoded.
+        self.sink.set_property('drop', False)
+        self.sink.set_property('max-buffers', BUFFER_SIZE)
+        self.sink.set_property('sync', False)
+        # The callback to receive decoded data.
+        self.sink.set_property('emit-signals', True)
+        self.sink.connect("new-buffer", self._new_buffer)
         
         # We'll need to know when the stream becomes ready and we get
         # its attributes. This semaphore will become available when the
@@ -184,10 +197,6 @@ class GstAudioFile(object):
         # when it becomes ready).
         self.pipeline.add(self.dec, self.conv, self.sink)
         self.conv.link(self.sink)
-        
-        # The callback to receive decoded data.
-        self.sink.set_property('emit-signals', True)
-        self.sink.connect("new-buffer", self._new_buffer)
         
         # Set up the queue for data and run the main thread.
         self.queue = Queue.Queue(QUEUE_SIZE)
