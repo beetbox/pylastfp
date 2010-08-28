@@ -1,5 +1,6 @@
 # Documentation.
 include README.rst
+include COPYING.txt
 
 # Utility script.
 include lastmatch.py

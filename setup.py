@@ -30,7 +30,7 @@ setup(
     author = 'Adrian Sampson',
     author_email = 'adrian@radbox.org',
     url = 'http://beets.radbox.org/pylastfp/',
-    license = 'MIT',
+    license = 'LGPL',
     platforms = 'ALL',
     long_description = _read('README.rst'),
 
