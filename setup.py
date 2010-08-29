@@ -48,9 +48,11 @@ if 'sdist' in sys.argv:
         print 'We need Cython to build a source distribution.'
         sys.exit(1)
     from Cython.Compiler import Main
+    source = ext.sources[0] # hacky!
     Main.compile(
-        [s for s in ext.sources if s.endswith('.pyx')],
+        source,
         cplus = True,
+        full_module_name = ext.name,
     )
 
 setup(
