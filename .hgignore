@@ -1,5 +1,7 @@
 syntax: glob
 build
 dist
-*.cpp
 MANIFEST
+
+syntax: regexp
+^[^/]+\.cpp
