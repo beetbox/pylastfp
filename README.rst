@@ -74,11 +74,22 @@ second, in accordance with `Last.fm's API TOS`_.
 To-Do
 -----
 
-Things to do:
+The fingerprinting library allows for an optimization that skips decoding
+a few milliseconds at the beginning of every file. (See
+``FingerprintExtractor::getToSkipMs()``, as demonstrated by the
+`example client`_.) This will complicate the module's interface a bit because
+the decoding source will need to know the amount of time to skip.
 
-- silence-skipping optimization
-- error handling for API calls
-- submit track metadata along with fingerprint data
+.. _example client:
+    http://github.com/lastfm/Fingerprinter/blob/master/lastfmfpclient/
+    src/main.cpp#L372
+
+We should also probably detect and handle errors in calling the Last.fm API,
+including both HTTP errors and the API's `error codes`_. Finally, the API
+lets you submit existing metadata to help improve Last.fm's database;
+we should allow this as an optional parameter.
+
+.. _error codes: http://www.last.fm/api/errorcodes
 
 
 Credits

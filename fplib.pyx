@@ -54,7 +54,7 @@ cdef class Extractor(object):
         bufstr = str(pcmblock)
         bufsize = len(pcmblock)/sizeof(short)
         bufcstr = bufstr
-        out = self.fe.process(<short*>bufcstr, bufsize, 0)
+        out = self.fe.process(<short*>bufcstr, bufsize, int(done))
         return bool(out)
     
     def result(self):
