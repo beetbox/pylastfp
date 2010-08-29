@@ -88,16 +88,21 @@ class BadResponseError(QueryError):
     pass
 class NotFoundError(QueryError):
     pass
-def fpid_query(duration, fpdata):
+def fpid_query(duration, fpdata, metadata=None):
     """Send fingerprint data to Last.fm to get the corresponding
     fingerprint ID, which can then be used to fetch metadata.
     duration is the length of the track in (integral) seconds.
-    Returns the fpid, an integer or raises a QueryError.
+    If metadata is provided, it is a dictionary with three optional
+    fields reflecting the current metadata for the file: "artist",
+    "album", and "title". These values are optional but might help
+    improve the database. Returns the fpid, an integer, or raises a
+    QueryError.
     """
+    metadata = metadata or {}
     params = {
-        'artist': '', # fixme
-        'album': '',
-        'track': '',
+        'artist': metadata.get('artist', ''),
+        'album': metadata.get('album', ''),
+        'track': metadata.get('title', ''),
         'duration': duration,
     }
     url = '%s?%s' % (URL_FPID, urllib.urlencode(params))
@@ -172,16 +177,18 @@ def extract(pcmiter, samplerate, channels, duration = -1):
 
 # Main inteface.
 
-def match(apikey, pcmiter, samplerate, duration, channels=2):
+def match(apikey, pcmiter, samplerate, duration, channels=2, metadata=None):
     """Given a PCM data stream, perform fingerprinting and look up the
     metadata for the audio. pcmiter must be an iterable of blocks of
     PCM data (buffers). duration is the total length of the track in
-    seconds (an integer). Returns a list of track info dictionaries
+    seconds (an integer). metadata may be a dictionary containing
+    existing metadata for the file (optional keys: "artist", "album",
+    and "title"). Returns a list of track info dictionaries
     describing the candidate metadata returned by Last.fm. Raises a
     subclass of FingerprintError if any step fails.
     """
     fpdata = extract(pcmiter, samplerate, channels)
-    fpid = fpid_query(duration, fpdata)
+    fpid = fpid_query(duration, fpdata, metadata)
     return metadata_query(fpid, apikey)
 
 def parse_metadata(xml):
@@ -203,14 +210,14 @@ def parse_metadata(xml):
 
 # Convenience functions for using audio decoders.
 
-def gst_match(apikey, path):
+def gst_match(apikey, path, metadata=None):
     """Uses Gstreamer to decode an audio file and perform a match.
     Requires the Python Gstreamer bindings.
     """
     from . import gstdec
     with gstdec.GstAudioFile(path) as f:
-        return match(apikey, f,
-                     f.samplerate, f.duration/1000000000, f.channels)
+        return match(apikey, f, f.samplerate, f.duration/1000000000,
+                     f.channels, metadata)
 
 def _readblocks(f, block_size=1024):
     """A generator that, given a file-like object, reads blocks (of
@@ -222,7 +229,7 @@ def _readblocks(f, block_size=1024):
         if not out:
             break
         yield out
-def mad_match(apikey, path):
+def mad_match(apikey, path, metadata=None):
     """Uses MAD to decode an MPEG audio file and perform a match.
     Requires the pymad module.
     """
@@ -239,5 +246,5 @@ def mad_match(apikey, path):
     else:
         channels = 2
     
-    return match(apikey, _readblocks(f),
-                 f.samplerate(), f.total_time()/1000, channels)
+    return match(apikey, _readblocks(f), f.samplerate(),
+                 f.total_time()/1000, channels, metadata)

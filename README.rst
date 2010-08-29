@@ -9,7 +9,7 @@ helpers for decoding audio files.
 Installation
 ------------
 
-To install, you will a compiler and the dependencies required by fplib
+To install, you will need a compiler and the dependencies required by fplib
 itself: `fftw`_ (compiled for single-precision floats) and `libsamplerate`_.
 Once you have these, just type::
 
@@ -30,7 +30,7 @@ the generated C++ file, avoiding the need for Cython. This package's
 Running
 -------
 
-You run the included fingerprinter/lookup script, ``lastmatch.py``,
+You can run the included fingerprinter/lookup script, ``lastmatch.py``,
 to test your installation::
 
     $ ./lastmatch.py mysterious_music.mp3
@@ -60,8 +60,8 @@ The script exhibits the usual way to use pylastfp, which is this::
 This example uses the ``gst_match`` convenience function, which uses Gstreamer
 to decode audio data. The function imports the Gstreamer module when called,
 so if you don't want to depend on Gstreamer, just don't call this function.
-Another similar function called ``mad_match`` instead imports the pymad module
-and uses MAD to decode instead of Gstreamer.
+Another similar function called ``mad_match`` instead imports the pymad
+library and uses MAD to decode instead of Gstreamer.
 
 If you have your own way of decoding audio, you can use the lower-level
 interface::
@@ -72,6 +72,12 @@ Of course, you'll need a PCM stream for the audio you want to
 fingerprint. The pcmdata parameter must be an iterable of Python
 ``str`` or ``buffer`` objects containing PCM data as arrays of C ``short``
 (16-bit integer) values.
+
+All of these functions (``match``, ``gst_match``, and ``mad_match``) accept
+an additional optional parameter called ``metadata``. It should be a dict
+containing your current guess at the file's metadata. Last.fm might use
+this information to improve their database. The dict should use these keys
+(all of which are optional): ``"artist"``, ``"album"``, and ``"track"``.
 
 The module internally performs thread-safe API limiting to 5 queries per
 second, in accordance with `Last.fm's API TOS`_.
@@ -94,9 +100,7 @@ time to skip.
     src/main.cpp#L372
 
 We should also probably detect and handle errors in calling the Last.fm API,
-including both HTTP errors and the API's `error codes`_. Finally, the API
-lets you submit existing metadata to help improve Last.fm's database;
-we should allow this as an optional parameter.
+including both HTTP errors and the API's `error codes`_.
 
 .. _error codes: http://www.last.fm/api/errorcodes
 
