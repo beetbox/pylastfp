@@ -191,11 +191,23 @@ def match(apikey, pcmiter, samplerate, duration, channels=2, metadata=None):
     fpid = fpid_query(duration, fpdata, metadata)
     return metadata_query(fpid, apikey)
 
+class APIError(FingerprintError):
+    def __init__(self, code, message):
+        super(APIError, self).__init__(message)
+        self.code = code
+        self.message = message
 def parse_metadata(xml):
     """Given an XML document (string) returned from metadata_query(),
-    parse the response into a list of track info dicts.
+    parse the response into a list of track info dicts. May raise an
+    APIError if the lookup fails.
     """
     root = etree.fromstring(xml)
+    
+    status = root.attrib['status']
+    if status == 'failed':
+        error = root.find('error')
+        raise APIError(int(error.attrib['code']), error.text)
+    
     out = []
     for track in root.find('tracks').findall('track'):
         out.append({

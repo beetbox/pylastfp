@@ -99,11 +99,6 @@ time to skip.
     http://github.com/lastfm/Fingerprinter/blob/master/lastfmfpclient/
     src/main.cpp#L372
 
-We should also probably detect and handle errors in calling the Last.fm API,
-including both HTTP errors and the API's `error codes`_.
-
-.. _error codes: http://www.last.fm/api/errorcodes
-
 
 Credits
 -------
