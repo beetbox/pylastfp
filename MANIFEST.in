@@ -4,3 +4,10 @@ include COPYING.txt
 
 # Utility script.
 include lastmatch.py
+
+# Cython compilation result.
+include fplib.cpp
+
+# The library's header files are not included by default.
+include fplib/include/*.h
+include fplib/src/*.h

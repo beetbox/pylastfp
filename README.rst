@@ -1,7 +1,7 @@
 This is a Python interface to Last.fm's acoustic fingerprinting library (called
-`fplib`_) and its related API services. It currently supports fingerprint
-matching (but not submission of new fingerprints), fingerprint ID lookup, and
-track metadata lookup.
+`fplib`_) and its related API services. It performs fingerprint
+matching, fingerprint ID lookup, and track metadata lookup. It also has some
+helpers for decoding audio files.
 
 .. _fplib: http://github.com/lastfm/Fingerprinter
 
@@ -9,14 +9,20 @@ track metadata lookup.
 Installation
 ------------
 
-To install, you will need `Cython`_ in addition to a compiler and the
-dependencies required by fplib itself: `fftw`_ (single-precision) and
-`libsamplerate`_. Once you have these, just type ``python setup.py install``
-and you're good to go.
+To install, you will a compiler and the dependencies required by fplib
+itself: `fftw`_ (single-precision) and `libsamplerate`_. Once you have these,
+just type ``python setup.py install`` in the source distribution and you're
+good to go.
 
-.. _Cython: http://cython.org/
 .. _fftw: http://www.fftw.org/
 .. _libsamplerate: http://www.mega-nerd.com/SRC/`
+
+Too build from the version control source (i.e., not from a released
+distribution), you will also need `Cython`_. (The source distributions include
+the generated C++ file, avoiding the need for Cython. This package's
+``setup.py`` plays tricks to detect whether you have Cython installed.)
+
+.. _Cython: http://cython.org/
 
 
 Running
@@ -60,10 +66,10 @@ interface::
 
     >>> xml = lastfp.match(apikey, pcmdata, samplerate, time_in_secs)
 
-Of course, you'll need some way to get a PCM stream from any audio you want to
-fingerprint; this is (currently) outside the scope of this library. The
-pcmdata parameter must be an iterable of Python ``str`` of ``buffer`` objects
-containing PCM data as arrays of C ``short`` (16-bit integer) values.
+Of course, you'll need a PCM stream from any audio you want to
+fingerprint. The pcmdata parameter must be an iterable of Python
+``str`` or ``buffer`` objects containing PCM data as arrays of C ``short``
+(16-bit integer) values.
 
 The module internally performs thread-safe API limiting to 5 queries per
 second, in accordance with `Last.fm's API TOS`_.
