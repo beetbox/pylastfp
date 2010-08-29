@@ -1,6 +1,6 @@
 This is a Python interface to Last.fm's acoustic fingerprinting library (called
-`fplib`_) and its related API services. It performs fingerprint
-matching, fingerprint ID lookup, and track metadata lookup. It also has some
+`fplib`_) and its related API services. It performs fingerprint extraction,
+fingerprint ID lookup, and track metadata lookup. It also comes with some
 helpers for decoding audio files.
 
 .. _fplib: http://github.com/lastfm/Fingerprinter
@@ -10,30 +10,32 @@ Installation
 ------------
 
 To install, you will a compiler and the dependencies required by fplib
-itself: `fftw`_ (single-precision) and `libsamplerate`_. Once you have these,
-just type ``python setup.py install`` in the source distribution and you're
-good to go.
+itself: `fftw`_ (compiled for single-precision floats) and `libsamplerate`_.
+Once you have these, just type::
 
-.. _fftw: http://www.fftw.org/
-.. _libsamplerate: http://www.mega-nerd.com/SRC/`
+    $ python setup.py install
+    
+in the source distribution and you're good to go.
 
 Too build from the version control source (i.e., not from a released
 distribution), you will also need `Cython`_. (The source distributions include
 the generated C++ file, avoiding the need for Cython. This package's
 ``setup.py`` plays tricks to detect whether you have Cython installed.)
 
+.. _fftw: http://www.fftw.org/
+.. _libsamplerate: http://www.mega-nerd.com/SRC/
 .. _Cython: http://cython.org/
 
 
 Running
 -------
 
-You can then run the included fingerprinter/lookup script, "lastmatch.py," to
-test your installation::
+You run the included fingerprinter/lookup script, ``lastmatch.py``,
+to test your installation::
 
     $ ./lastmatch.py mysterious_music.mp3
 
-The script outputs metadata matches from Last.fm's database. This script
+This will show metadata matches from Last.fm's database. The script
 uses `Gstreamer's Python bindings`_ to decode MP3s. You can also use `pymad`_
 instead of Gstreamer (for MPEG audio only) by supplying the ``-m`` flag::
 
@@ -56,17 +58,17 @@ The script exhibits the usual way to use pylastfp, which is this::
     The National - Fake Emprire
 
 This example uses the ``gst_match`` convenience function, which uses Gstreamer
-to decode audio data. This function imports the Gstreamer module when called,
+to decode audio data. The function imports the Gstreamer module when called,
 so if you don't want to depend on Gstreamer, just don't call this function.
-Another similar function called ``mad_match`` imports the pymad module and
-uses MAD to decode instead of Gstreamer.
+Another similar function called ``mad_match`` instead imports the pymad module
+and uses MAD to decode instead of Gstreamer.
 
 If you have your own way of decoding audio, you can use the lower-level
 interface::
 
     >>> xml = lastfp.match(apikey, pcmdata, samplerate, time_in_secs)
 
-Of course, you'll need a PCM stream from any audio you want to
+Of course, you'll need a PCM stream for the audio you want to
 fingerprint. The pcmdata parameter must be an iterable of Python
 ``str`` or ``buffer`` objects containing PCM data as arrays of C ``short``
 (16-bit integer) values.
@@ -83,8 +85,9 @@ To-Do
 The fingerprinting library allows for an optimization that skips decoding
 a few milliseconds at the beginning of every file. (See
 ``FingerprintExtractor::getToSkipMs()``, as demonstrated by the
-`example client`_.) This will complicate the module's interface a bit because
-the decoding source will need to know the amount of time to skip.
+`example client`_.) Taking advantage of this will complicate the module's
+interface a bit because the decoding source will need to know the amount of
+time to skip.
 
 .. _example client:
     http://github.com/lastfm/Fingerprinter/blob/master/lastfmfpclient/
@@ -103,7 +106,9 @@ Credits
 
 This library is by `Adrian Sampson`_. It includes the fplib source code, which
 is by `Last.fm`_. fplib is licensed under the LGPLv3, so pylastfp uses the same
-license.
+license. pylastfp was written to be used with `beets`_, which you should
+probably check out.
 
 .. _Adrian Sampson: mailto:adrian@radbox.org
 .. _Last.fm: http://last.fm/
+.. _beets: http://beets.radbox.org/
