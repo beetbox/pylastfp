@@ -11,6 +11,14 @@ either Gstreamer (and its Python bindings) or pymad installed.
 """
 import sys
 import os
+
+# Just a little trickery to avoid importing the "lastfp" package that's
+# in the source distribution, because it won't contain the built
+# _fplib.so extension module. We need to import from the built verison,
+# and this script is likely to be run from the distribution root.
+for path in '', os.path.abspath(os.path.dirname(__file__)):
+    if path in sys.path:
+        sys.path.remove(path)
 import lastfp
 
 # This API key is specifically for this script, lastmatch.py. If you
