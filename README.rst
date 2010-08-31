@@ -11,20 +11,28 @@ Installation
 
 To install, you will need a compiler and the dependencies required by fplib
 itself: `fftw`_ (compiled for single-precision floats) and `libsamplerate`_.
-Once you have these, just type::
+
+Once you have these, you can easily install from PyPI using `pip`_::
+
+    $ pip install pylastfp
+
+Or, if you don't have pip (or easy_install), head to the `download page`_.
+The normal install command should work::
 
     $ python setup.py install
     
 in the source distribution and you're good to go.
 
-Too build from the version control source (i.e., not from a released
-distribution), you will also need `Cython`_. (The source distributions include
+To build from the version control source (i.e., not from a release
+tarball), you will also need `Cython`_. (The source distributions include
 the generated C++ file, avoiding the need for Cython. This package's
 ``setup.py`` plays tricks to detect whether you have Cython installed.)
 
 .. _fftw: http://www.fftw.org/
 .. _libsamplerate: http://www.mega-nerd.com/SRC/
 .. _Cython: http://cython.org/
+.. _pip: http://pip.openplans.org/
+.. _download page: http://github.com/sampsyo/pylastfp/downloads
 
 
 Running
