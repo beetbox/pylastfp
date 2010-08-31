@@ -79,6 +79,13 @@ setup(
     license = 'LGPL',
     platforms = 'ALL',
     long_description = _read('README.rst'),
+    classifiers = [
+        'Topic :: Multimedia :: Sound/Audio :: Analysis',
+        'License :: OSI Approved :: GNU Library or Lesser General '
+        'Public License (LGPL)',
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+    ],
 
     cmdclass = cmdclass,
     ext_modules = [ext],
