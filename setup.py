@@ -1,8 +1,22 @@
+import os
+import sys
+
+# Work around Setuptools' broken (Cython-unaware) monkeypatching
+# to support Pyrex. I don't want to use Setuptools in this file, but it
+# is used automatically (and automatically monkeypatches) if we're
+# installed, for example, with pip.
+try:
+    import setuptools.dist
+    import setuptools.extension
+except ImportError:
+    pass
+else:
+    setuptools.extension.Extension.__init__ = \
+        setuptools.dist._get_unpatched(setuptools.extension.Extension).__init__
+
 from distutils.core import setup
 from distutils.command import sdist
 from distutils.extension import Extension
-import os
-import sys
 
 # Import and use Cython if available.
 try:
