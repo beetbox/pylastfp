@@ -21,8 +21,6 @@ The normal install command should work::
 
     $ python setup.py install
     
-in the source distribution and you're good to go.
-
 To build from the version control source (i.e., not from a release
 tarball), you will also need `Cython`_. (The source distributions include
 the generated C++ file, avoiding the need for Cython. This package's
@@ -41,13 +39,13 @@ Running
 You can run the included fingerprinter/lookup script, ``lastmatch.py``,
 to test your installation::
 
-    $ ./lastmatch.py mysterious_music.mp3
+    $ lastmatch.py mysterious_music.mp3
 
 This will show metadata matches from Last.fm's database. The script
 uses `Gstreamer's Python bindings`_ to decode MP3s. You can also use `pymad`_
 instead of Gstreamer (for MPEG audio only) by supplying the ``-m`` flag::
 
-    $ ./lastmatch.py -m mysterious_music.mp3
+    $ lastmatch.py -m mysterious_music.mp3
 
 .. _Gstreamer's Python bindings:
    http://gstreamer.freedesktop.org/modules/gst-python.html

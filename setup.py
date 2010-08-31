@@ -91,4 +91,5 @@ setup(
     ext_modules = [ext],
     
     packages = ['lastfp'],
+    scripts = ['lastmatch.py'],
 )

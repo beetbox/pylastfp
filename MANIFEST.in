@@ -2,9 +2,6 @@
 include README.rst
 include COPYING.txt
 
-# Utility script.
-include lastmatch.py
-
 # Cython compilation result.
 include fplib.cpp
 
