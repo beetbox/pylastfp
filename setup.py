@@ -75,7 +75,7 @@ setup(
     description = "bindings for Last.fm's acoustic fingerprinting (fplib)",
     author = 'Adrian Sampson',
     author_email = 'adrian@radbox.org',
-    url = 'http://beets.radbox.org/pylastfp/',
+    url = 'http://github.com/sampsyo/pylastfp/',
     license = 'LGPL',
     platforms = 'ALL',
     long_description = _read('README.rst'),
