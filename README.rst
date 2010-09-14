@@ -11,6 +11,8 @@ Installation
 
 To install, you will need a compiler and the dependencies required by fplib
 itself: `fftw`_ (compiled for single-precision floats) and `libsamplerate`_.
+(On Debian/Ubuntu, the packages are ``libfftw3-dev`` and
+``libsamplerate0-dev``.)
 
 Once you have these, you can easily install from PyPI using `pip`_::
 
