@@ -23,6 +23,7 @@ from __future__ import with_statement # for Python 2.5
 import urllib
 import urllib2
 import xml.etree.ElementTree as etree
+from xml.parsers.expat import ExpatError
 import os
 import threading
 import time
@@ -196,16 +197,26 @@ def match(apikey, pcmiter, samplerate, duration, channels=2, metadata=None):
     return metadata_query(fpid, apikey)
 
 class APIError(FingerprintError):
+    # Raised for errors returned by the API service.
     def __init__(self, code, message):
         super(APIError, self).__init__(message)
         self.code = code
         self.message = message
+class CommunicationError(FingerprintError):
+    # Raised when we can't communicate with the API service.
+    pass
 def parse_metadata(xml):
     """Given an XML document (string) returned from metadata_query(),
     parse the response into a list of track info dicts. May raise an
     APIError if the lookup fails.
     """
-    root = etree.fromstring(xml)
+    try:
+        root = etree.fromstring(xml)
+    except ExpatError:
+        # The Last.fm API occasionally generates malformed XML when its
+        # includes an illegal character (UTF8-legal but prohibited by
+        # the XML standard).
+        raise CommunicationError('malformed XML response')
     
     status = root.attrib['status']
     if status == 'failed':
