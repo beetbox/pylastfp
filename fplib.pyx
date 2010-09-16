@@ -25,7 +25,7 @@ cdef extern from "FingerprintExtractor.h":
         void initForQuery(int freq, int nchannels, int duration)
         void initForFullSubmit(int freq, int nchannels)
         int process(short* pPCM, size_t num_samples,
-                     int end_of_stream)
+                    int end_of_stream) except +
         StringSizePair getFingerprint()
     FingerprintExtractor *newExtractor \
             "new fingerprint::FingerprintExtractor" ()

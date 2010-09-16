@@ -160,9 +160,13 @@ def extract(pcmiter, samplerate, channels, duration = -1):
         done = next_block is None
 
         # Process the block.
-        if extractor.process(cur_block, done):
-            # Success!
-            break
+        try:
+            if extractor.process(cur_block, done):
+                # Success!
+                break
+        except RuntimeError, exc:
+            # Exception from fplib. Most likely the file is too short.
+            raise ExtractionError(exc.args[0])
 
         # End of file but processor never became ready?
         if done:

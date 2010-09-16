@@ -108,6 +108,16 @@ time to skip.
     src/main.cpp#L372
 
 
+Version History
+---------------
+
+0.2
+  Fail safely when file is too short.
+
+0.1
+  Initial release.
+
+
 Credits
 -------
 
