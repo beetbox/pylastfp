@@ -112,6 +112,7 @@ Version History
 ---------------
 
 0.2
+  Fix a horrible memory leak.
   Fail safely when file is too short.
   Safely handle malformed XML returned from the API.
 

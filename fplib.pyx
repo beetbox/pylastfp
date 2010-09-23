@@ -40,8 +40,11 @@ cdef class Extractor(object):
         """
         self.fe = newExtractor()
         self.fe.initForQuery(samplerate, channels, duration)
+    def free(self):
+        if self.fe:
+            delExtractor(self.fe)
     def __del__(self):
-        delExtractor(self.fe)
+        self.free()
 
     def process(self, pcmblock, done):
         """Send a block of PCM data (as an array of C short integers)

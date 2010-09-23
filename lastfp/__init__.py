@@ -177,6 +177,10 @@ def extract(pcmiter, samplerate, channels, duration = -1):
     out = extractor.result()
     if out is None:
         raise ExtractionError()
+    
+    # Free extractor memory.
+    extractor.free()
+    
     return out
 
 
