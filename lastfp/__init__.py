@@ -22,6 +22,7 @@ Last.fm servers for matches in one fell swoop.
 from __future__ import with_statement # for Python 2.5
 import urllib
 import urllib2
+import httplib
 import xml.etree.ElementTree as etree
 from xml.parsers.expat import ExpatError
 import os
@@ -122,6 +123,9 @@ def fpid_query(duration, fpdata, metadata=None):
     else:
         raise BadResponseError('unknown status: ' + res)
 
+class CommunicationError(FingerprintError):
+    # Raised when we can't communicate with the API service.
+    pass
 def metadata_query(fpid, apikey):
     """Queries the Last.fm servers for metadata about a given
     fingerprint ID (an integer). Returns the XML response (a string).
@@ -132,7 +136,10 @@ def metadata_query(fpid, apikey):
         'api_key': apikey,
     }
     url = '%s?%s' % (URL_METADATA, urllib.urlencode(params))
-    fh = _query_wrap(urllib.urlopen, url)
+    try:
+        fh = _query_wrap(urllib.urlopen, url)
+    except httplib.HTTPError:
+        raise CommunicationError()
     return fh.read()
 
 class ExtractionError(FingerprintError):
@@ -206,9 +213,6 @@ class APIError(FingerprintError):
         super(APIError, self).__init__(message)
         self.code = code
         self.message = message
-class CommunicationError(FingerprintError):
-    # Raised when we can't communicate with the API service.
-    pass
 def parse_metadata(xml):
     """Given an XML document (string) returned from metadata_query(),
     parse the response into a list of track info dicts. May raise an
