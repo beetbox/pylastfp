@@ -26,6 +26,7 @@ import xml.etree.ElementTree as etree
 from xml.parsers.expat import ExpatError
 import threading
 import time
+import httplib
 from . import _fplib
 
 URL_FPID = 'http://www.last.fm/fingerprint/query/'
@@ -113,6 +114,8 @@ def fpid_query(duration, fpdata, metadata=None):
         res = _query_wrap(formdata_post, url, {'fpdata': fpdata})
     except urllib2.HTTPError:
         raise CommunicationError('ID query failed')
+    except httplib.BadStatusLine:
+        raise CommunicationError('bad response in ID query')
     
     try:
         fpid, status = res.split()[:2]
@@ -141,6 +144,8 @@ def metadata_query(fpid, apikey):
         fh = _query_wrap(urllib.urlopen, url)
     except urllib2.HTTPError:
         raise CommunicationError('metadata query failed')
+    except httplib.BadStatusLine:
+        raise CommunicationError('bad response in metadata query')
     return fh.read()
 
 class ExtractionError(FingerprintError):

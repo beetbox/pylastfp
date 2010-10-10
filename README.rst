@@ -113,6 +113,7 @@ Version History
 
 0.3
   Fix typo in handling of HTTP errors.
+  Handle cases when HTTP status line is malformed.
 
 0.2
   Fix a horrible memory leak.
