@@ -22,10 +22,8 @@ Last.fm servers for matches in one fell swoop.
 from __future__ import with_statement # for Python 2.5
 import urllib
 import urllib2
-import httplib
 import xml.etree.ElementTree as etree
 from xml.parsers.expat import ExpatError
-import os
 import threading
 import time
 from . import _fplib
@@ -90,6 +88,9 @@ class BadResponseError(QueryError):
     pass
 class NotFoundError(QueryError):
     pass
+class CommunicationError(FingerprintError):
+    # Raised when we can't communicate with the APIs.
+    pass
 def fpid_query(duration, fpdata, metadata=None):
     """Send fingerprint data to Last.fm to get the corresponding
     fingerprint ID, which can then be used to fetch metadata.
@@ -108,7 +109,10 @@ def fpid_query(duration, fpdata, metadata=None):
         'duration': duration,
     }
     url = '%s?%s' % (URL_FPID, urllib.urlencode(params))
-    res = _query_wrap(formdata_post, url, {'fpdata': fpdata})
+    try:
+        res = _query_wrap(formdata_post, url, {'fpdata': fpdata})
+    except urllib2.HTTPError:
+        raise CommunicationError('ID query failed')
     
     try:
         fpid, status = res.split()[:2]
@@ -123,9 +127,6 @@ def fpid_query(duration, fpdata, metadata=None):
     else:
         raise BadResponseError('unknown status: ' + res)
 
-class CommunicationError(FingerprintError):
-    # Raised when we can't communicate with the API service.
-    pass
 def metadata_query(fpid, apikey):
     """Queries the Last.fm servers for metadata about a given
     fingerprint ID (an integer). Returns the XML response (a string).
@@ -138,8 +139,8 @@ def metadata_query(fpid, apikey):
     url = '%s?%s' % (URL_METADATA, urllib.urlencode(params))
     try:
         fh = _query_wrap(urllib.urlopen, url)
-    except httplib.HTTPError:
-        raise CommunicationError()
+    except urllib2.HTTPError:
+        raise CommunicationError('metadata query failed')
     return fh.read()
 
 class ExtractionError(FingerprintError):

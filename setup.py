@@ -71,7 +71,7 @@ if 'sdist' in sys.argv:
 
 setup(
     name = 'pylastfp',
-    version = '0.2',
+    version = '0.3',
     description = "bindings for Last.fm's acoustic fingerprinting (fplib)",
     author = 'Adrian Sampson',
     author_email = 'adrian@radbox.org',

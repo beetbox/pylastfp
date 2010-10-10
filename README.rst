@@ -111,6 +111,9 @@ time to skip.
 Version History
 ---------------
 
+0.3
+  Fix typo in handling of HTTP errors.
+
 0.2
   Fix a horrible memory leak.
   Fail safely when file is too short.
