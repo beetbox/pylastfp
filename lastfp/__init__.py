@@ -116,6 +116,8 @@ def fpid_query(duration, fpdata, metadata=None):
         raise CommunicationError('ID query failed')
     except httplib.BadStatusLine:
         raise CommunicationError('bad response in ID query')
+    except IOError:
+        raise CommunicationError('ID query failed')
     
     try:
         fpid, status = res.split()[:2]
@@ -146,6 +148,8 @@ def metadata_query(fpid, apikey):
         raise CommunicationError('metadata query failed')
     except httplib.BadStatusLine:
         raise CommunicationError('bad response in metadata query')
+    except IOError:
+        raise CommunicationError('metadata query failed')
     return fh.read()
 
 class ExtractionError(FingerprintError):
