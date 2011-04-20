@@ -52,7 +52,6 @@ from __future__ import with_statement
 
 import gst
 import sys
-import time
 import gobject
 import threading
 import os
@@ -189,7 +188,7 @@ class GstAudioFile(object):
         self.sink.set_property('caps',
             gst.Caps('audio/x-raw-int, width=16, depth=16, signed=true')
         )
-        # FIXME set endianness?
+        # TODO set endianness?
         # Set up the characteristics of the output. We don't want to
         # drop any data (nothing is real-time here); we should bound
         # the memory usage of the internal queue; and, most
@@ -208,7 +207,9 @@ class GstAudioFile(object):
         # caps are received. That way, when __init__() returns, the file
         # (and its attributes) will be ready for reading.
         self.ready_sem = threading.Semaphore(0)
-        self.sink.get_pad("sink").connect("notify::caps", self._notify_caps)
+        self.caps_handler = self.sink.get_pad("sink").connect(
+            "notify::caps", self._notify_caps
+        )
         
         # Link up everything but the decoder (which must be linked only
         # when it becomes ready).
@@ -281,10 +282,11 @@ class GstAudioFile(object):
             self.ready_sem.release()
     
     def _new_buffer(self, sink):
-        # New data is available from the pipeline! Dump it into our
-        # queue (or possibly block if we're full).
-        buf = sink.emit('pull-buffer')
-        self.queue.put(str(buf))
+        if self.running:
+            # New data is available from the pipeline! Dump it into our
+            # queue (or possibly block if we're full).
+            buf = sink.emit('pull-buffer')
+            self.queue.put(str(buf))
     
     def _unkown_type(self, uridecodebin, decodebin, caps):
         # This is called *before* the stream becomes ready when the
@@ -324,8 +326,27 @@ class GstAudioFile(object):
     # Cleanup.
     def close(self):
         if self.running:
-            self.thread.release()
             self.running = False
+
+            # Stop reading the file.
+            self.dec.set_property("uri", None)
+            # Block spurious signals.
+            self.sink.get_pad("sink").disconnect(self.caps_handler)
+
+            # Make space in the output queue to let the decoder thread
+            # finish. (Otherwise, the thread blocks on its enqueue and
+            # the interpreter hangs.)
+            try:
+                self.queue.get_nowait()
+            except Queue.Empty:
+                pass
+
+            # Halt the pipeline (closing file).
+            self.pipeline.set_state(gst.STATE_NULL)
+
+            # Clean up the thread.
+            self.thread.release()
+
     def __del__(self):
         self.close()
     

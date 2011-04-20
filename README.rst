@@ -111,6 +111,9 @@ time to skip.
 Version History
 ---------------
 
+0.4
+  Fix cleanup bug in gstdec that was causing files to remain open.
+
 0.3
   Fix typo in handling of HTTP errors.
   Handle cases when HTTP status line is malformed.
