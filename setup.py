@@ -30,7 +30,7 @@ def _read(fn):
     return open(path).read()
 
 # Search far and wide for the dependencies.
-INC_DIRS = ['/opt/local/include']
+INC_DIRS = ['/opt/local/include', os.path.expanduser('~/.brew/include')]
 
 ext = Extension(
     "lastfp._fplib",
@@ -71,7 +71,7 @@ if 'sdist' in sys.argv:
 
 setup(
     name = 'pylastfp',
-    version = '0.4',
+    version = '0.5',
     description = "bindings for Last.fm's acoustic fingerprinting (fplib)",
     author = 'Adrian Sampson',
     author_email = 'adrian@radbox.org',

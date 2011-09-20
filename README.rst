@@ -111,6 +111,9 @@ time to skip.
 Version History
 ---------------
 
+0.5
+  ``setup.py`` now searches the `Homebrew`_ user-local prefix.
+
 0.4
   Fix cleanup bug in gstdec that was causing files to remain open.
 
@@ -126,6 +129,8 @@ Version History
 
 0.1
   Initial release.
+
+.. _Homebrew: http://mxcl.github.com/homebrew/
 
 
 Credits
