@@ -230,7 +230,7 @@ def parse_metadata(xml):
     """
     try:
         root = etree.fromstring(xml)
-    except ExpatError:
+    except (ExpatError, etree.ParseError):
         # The Last.fm API occasionally generates malformed XML when its
         # includes an illegal character (UTF8-legal but prohibited by
         # the XML standard).

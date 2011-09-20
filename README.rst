@@ -112,6 +112,7 @@ Version History
 ---------------
 
 0.5
+  Handle empty responses from the API.
   ``setup.py`` now searches the `Homebrew`_ user-local prefix.
 
 0.4
