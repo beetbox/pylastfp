@@ -1,7 +1,6 @@
 This is a Python interface to Last.fm's acoustic fingerprinting library (called
 `fplib`_) and its related API services. It performs fingerprint extraction,
-fingerprint ID lookup, and track metadata lookup. It also comes with some
-helpers for decoding audio files.
+fingerprint ID lookup, and track metadata lookup.
 
 .. _fplib: http://github.com/lastfm/Fingerprinter
 
@@ -34,6 +33,12 @@ the generated C++ file, avoiding the need for Cython. This package's
 .. _pip: http://pip.openplans.org/
 .. _download page: http://github.com/sampsyo/pylastfp/downloads
 
+This library also depends on `audioread`_ to decode audio, although this
+dependency is technically optional. If you already have a mechanism for decoding
+audio files, there is no need to install audioread.
+
+.. _audioread: https://github.com/sampsyo/audioread
+
 
 Running
 -------
@@ -43,15 +48,9 @@ to test your installation::
 
     $ lastmatch.py mysterious_music.mp3
 
-This will show metadata matches from Last.fm's database. The script
-uses `Gstreamer's Python bindings`_ to decode MP3s. You can also use `pymad`_
-instead of Gstreamer (for MPEG audio only) by supplying the ``-m`` flag::
-
-    $ lastmatch.py -m mysterious_music.mp3
-
-.. _Gstreamer's Python bindings:
-   http://gstreamer.freedesktop.org/modules/gst-python.html
-.. _pymad: http://spacepants.org/src/pymad/
+This will show metadata matches from Last.fm's database. The script uses
+`audioread`_ to decode music, so it should transparently use a media library
+available on your system (GStreamer, FFmpeg, MAD, or Core Audio on Mac OS X).
 
 
 Using in Your Code
@@ -60,16 +59,15 @@ Using in Your Code
 The script exhibits the usual way to use pylastfp, which is this::
 
     >>> import lastfp
-    >>> xml = lastfp.gst_match(apikey, path)
+    >>> xml = lastfp.match_file(apikey, path)
     >>> matches = lastfp.parse_metadata(xml)
     >>> print matches[0]['artist'], '-', matches[0]['title']
     The National - Fake Emprire
 
-This example uses the ``gst_match`` convenience function, which uses Gstreamer
-to decode audio data. The function imports the Gstreamer module when called,
-so if you don't want to depend on Gstreamer, just don't call this function.
-Another similar function called ``mad_match`` instead imports the pymad
-library and uses MAD to decode instead of Gstreamer.
+This example uses the ``match_file`` convenience function, which uses
+`audioread`_ to decode audio data. The function imports the ``audioread`` module
+when called, so if you don't want to depend on that, just don't call this
+function.
 
 If you have your own way of decoding audio, you can use the lower-level
 interface::
@@ -81,11 +79,11 @@ fingerprint. The pcmdata parameter must be an iterable of Python
 ``str`` or ``buffer`` objects containing PCM data as arrays of C ``short``
 (16-bit integer) values.
 
-All of these functions (``match``, ``gst_match``, and ``mad_match``) accept
-an additional optional parameter called ``metadata``. It should be a dict
-containing your current guess at the file's metadata. Last.fm might use
-this information to improve their database. The dict should use these keys
-(all of which are optional): ``"artist"``, ``"album"``, and ``"track"``.
+Both functions (``match`` and ``match_file``) accept an additional optional
+parameter called ``metadata``. It should be a dict containing your current guess
+at the file's metadata. Last.fm might use this information to improve their
+database. The dict should use these keys (all of which are optional):
+``"artist"``, ``"album"``, and ``"track"``.
 
 The module internally performs thread-safe API limiting to 5 queries per
 second, in accordance with `Last.fm's API TOS`_.
@@ -111,6 +109,9 @@ time to skip.
 Version History
 ---------------
 
+0.6
+  Use `audioread`_ instead of the included `pygst`_ and `pymad`_ decoders.
+
 0.5
   Handle empty responses from the API.
   ``setup.py`` now searches the `Homebrew`_ user-local prefix.
@@ -132,6 +133,8 @@ Version History
   Initial release.
 
 .. _Homebrew: http://mxcl.github.com/homebrew/
+.. _pymad: http://spacepants.org/src/pymad/
+.. _pygst: http://gstreamer.freedesktop.org/modules/gst-python.html
 
 
 Credits

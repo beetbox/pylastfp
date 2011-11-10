@@ -1,5 +1,5 @@
 # This file is part of pylastfp.
-# Copyright 2010, Adrian Sampson.
+# Copyright 2011, Adrian Sampson.
 # 
 # pylastfp is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as
@@ -253,43 +253,18 @@ def parse_metadata(xml):
     return out
 
 
-# Convenience functions for using audio decoders.
+# Convenience functions using an audio decoder.
 
-def gst_match(apikey, path, metadata=None):
-    """Uses Gstreamer to decode an audio file and perform a match.
-    Requires the Python Gstreamer bindings.
+def match_file(apikey, path, metadata=None):
+    """Uses the audioread library to decode an audio file and match it.
     """
-    from . import gstdec
-    with gstdec.GstAudioFile(path) as f:
-        return match(apikey, f, f.samplerate, f.duration/1000000000,
+    import audioread
+    with audioread.audio_open(path) as f:
+        return match(apikey, iter(f), f.samplerate, int(f.duration),
                      f.channels, metadata)
 
-def _readblocks(f, block_size=1024):
-    """A generator that, given a file-like object, reads blocks (of
-    the given size) from the file and yields them until f.read()
-    returns a "falsey" value.
-    """
-    while True:
-        out = f.read(block_size)
-        if not out:
-            break
-        yield out
-def mad_match(apikey, path, metadata=None):
-    """Uses MAD to decode an MPEG audio file and perform a match.
-    Requires the pymad module.
-    """
-    import mad
-    f = mad.MadFile(path)
-    
-    # Get number of channels.
-    if f.mode() == mad.MODE_SINGLE_CHANNEL:
-        channels = 1
-    elif f.mode() in (mad.MODE_DUAL_CHANNEL,
-                      mad.MODE_JOINT_STEREO,
-                      mad.MODE_STEREO):
-        channels = 2
-    else:
-        channels = 2
-    
-    return match(apikey, _readblocks(f), f.samplerate(),
-                 f.total_time()/1000, channels, metadata)
+# For backwards compatibility. Earlier versions of this library embedded
+# a GStreamer-based decoder; this one depends on an external library
+# that is a superset of that decoder.
+gst_match = match_file
+mad_match = match_file

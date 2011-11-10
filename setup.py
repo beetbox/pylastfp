@@ -14,7 +14,7 @@ else:
     setuptools.extension.Extension.__init__ = \
         setuptools.dist._get_unpatched(setuptools.extension.Extension).__init__
 
-from distutils.core import setup
+from setuptools import setup
 from distutils.command import sdist
 from distutils.extension import Extension
 
@@ -71,7 +71,7 @@ if 'sdist' in sys.argv:
 
 setup(
     name = 'pylastfp',
-    version = '0.5',
+    version = '0.6',
     description = "bindings for Last.fm's acoustic fingerprinting (fplib)",
     author = 'Adrian Sampson',
     author_email = 'adrian@radbox.org',
@@ -86,6 +86,8 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
     ],
+
+    install_requires = ['audioread'],
 
     cmdclass = cmdclass,
     ext_modules = [ext],
