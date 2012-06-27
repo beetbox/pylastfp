@@ -79,15 +79,6 @@ public:
          return m_sum / m_values.size();
    }
 
-   T getError() const
-   {
-      T real_sum = 0;
-      const T* pCircularBuffer = m_values.get_buffer();
-      for ( int i = 0; i < size; ++i )
-         real_sum += pCircularBuffer[i];
-      return abs(real_sum - m_sum) / this->size();
-   }
-
    size_t size() const
    {
       return m_values.size();

@@ -111,6 +111,7 @@ Version History
 
 0.6
   Use `audioread`_ instead of the included `pygst`_ and `pymad`_ decoders.
+  Fix compilation under clang 3.1.
 
 0.5
   Handle empty responses from the API.
