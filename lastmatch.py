@@ -9,6 +9,7 @@ makes it use MAD instead (which, of course, only works on MPEG audio
 such as MP3). To use the script, of course, you'll need to have
 either Gstreamer (and its Python bindings) or pymad installed.
 """
+from __future__ import print_function
 import sys
 import os
 
@@ -30,7 +31,7 @@ API_KEY = '7821ee9bf9937b7f94af2abecced8ddd'
 if __name__ == '__main__':
     args = sys.argv[1:]
     if not args:
-        print "usage: python lastmatch.py [-m] mysterious_music.mp3 [...]"
+        print("usage: python lastmatch.py [-m] mysterious_music.mp3 [...]")
         sys.exit(1)
     if args[0] == '-m':
         match_func = lastfp.mad_match
@@ -45,14 +46,14 @@ if __name__ == '__main__':
         try:
             xml = match_func(API_KEY, path)
         except lastfp.ExtractionError:
-            print 'fingerprinting failed!'
+            print('fingerprinting failed!')
             sys.exit(1)
         except lastfp.QueryError:
-            print 'could not match fingerprint!'
+            print('could not match fingerprint!')
             sys.exit(1)
 
         # Show results.
         matches = lastfp.parse_metadata(xml)
         for track in matches:
-            print '%f: %s - %s' % (track['rank'], track['artist'],
-                                   track['title'])
+            print('%f: %s - %s' % (track['rank'], track['artist'],
+                                   track['title']))

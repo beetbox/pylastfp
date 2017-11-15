@@ -163,7 +163,7 @@ def extract(pcmiter, samplerate, channels, duration = -1):
 
     # Get first block.
     try:
-        next_block = pcmiter.next()
+        next_block = next(pcmiter)
     except StopIteration:
         raise ExtractionError()
 
@@ -172,7 +172,7 @@ def extract(pcmiter, samplerate, channels, duration = -1):
         # Shift over blocks.
         cur_block = next_block
         try:
-            next_block = pcmiter.next()
+            next_block = next(pcmiter)
         except StopIteration:
             next_block = None
         done = next_block is None
@@ -182,7 +182,7 @@ def extract(pcmiter, samplerate, channels, duration = -1):
             if extractor.process(cur_block, done):
                 # Success!
                 break
-        except RuntimeError, exc:
+        except RuntimeError as exc:
             # Exception from fplib. Most likely the file is too short.
             raise ExtractionError(exc.args[0])
 

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import sys
 
@@ -59,7 +60,7 @@ else:
 # C++ source is included in the tarball also.
 if 'sdist' in sys.argv:
     if not HAVE_CYTHON:
-        print 'We need Cython to build a source distribution.'
+        print('We need Cython to build a source distribution.')
         sys.exit(1)
     from Cython.Compiler import Main
     source = ext.sources[0] # hacky!
